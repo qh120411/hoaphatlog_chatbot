@@ -55,9 +55,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     save_users(users)
     
-    # with open(USER_FILE, 'w', encoding='utf-8') as file:
-    #     json.dump(data, file, ensure_ascii=False, indent=4)
-    
     await update.message.reply_text(
         "Đã lưu thông tin của bạn ✅\n"
         f"full_name: {user.full_name}\n"
