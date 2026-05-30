@@ -1,4 +1,6 @@
-venv/
-.venv/
 .env
-/users.json
+.vscode/
+venv/
+crdt.json
+config/crdt.json
+__pycache__/
