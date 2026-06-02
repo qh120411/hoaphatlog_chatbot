@@ -1,57 +1,74 @@
-import asyncio
-
 from fastapi import FastAPI, Request
 from config.config import Config
 from zalo_bot import Bot, Update
-from zalo_bot.ext import ContextTypes
-from zalo_bot.constants import ChatAction
-from AI.router_client import LLM_Router
+from handlers.auth_handler import AuthHandler
+from handlers.verify_handler import VerifyHandler
+from handlers.chat_handler import ChatHandler
+from services.auth_service import AuthService
 
 app = FastAPI()
+
+VERIFY_COMMAND = "/start"
+
+
 class MockContext:
-    #fake context
     def __init__(self, bot):
         self.bot = bot
 
+
 class ZaloBotManager:
+    # Routes Zalo messages to appropriate handlers based on user state
+    
     def __init__(self, token: str):
         self.bot = Bot(token=token)
-        self.llm_router = LLM_Router() 
-
-    async def show_typing(self, chat_id: str):
-        await self.bot.send_chat_action(
-            chat_id=chat_id,
-            action=ChatAction.TYPING
-        )
-
-    async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        chat_id = update.message.chat.id
-        await self.show_typing(chat_id)
-        await asyncio.sleep(2)
-        await update.message.reply_text(
-            "Xin chào! Tôi là trợ lý ảo của công ty Hòa Phát Logistics. "
-            "Hãy gửi tin nhắn cho tôi để bắt đầu nhé!"
-        )
+        self.auth_handler = AuthHandler(self.bot)
+        self.verify_handler = VerifyHandler(self.bot)
+        self.chat_handler = ChatHandler(self.bot)
+        self.auth_service = AuthService()
+    
+    def is_verify_format(self, text: str) -> tuple:
         
-    async def echo(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        chat_id = update.message.chat.id
-        user_text = update.message.text
-        await self.show_typing(chat_id)
-        await asyncio.sleep(1)
-        response = await self.llm_router.call_llm(user_text)
-        await update.message.reply_text(response)
-
+        parts = text.strip().split()
+        if len(parts) == 2:
+            user_id, invite_key = parts[0], parts[1]
+            if any(c.isdigit() or c == '-' for c in invite_key):
+                return True, user_id, invite_key
+        return False, None, None
+    
     async def handle_update(self, update: Update):
         context = MockContext(self.bot)
         if not update.message:
-            print("⚠️ Update không có message")
+            print("⚠️ Update with no message received, ignoring.")
             return
-        text = update.message.text
         
-        if text == "/start":
-            await self.start(update, context)
+        text = update.message.text
+        chat_id = str(update.message.chat.id)
+        
+        # Step 1: /start command
+        if text == VERIFY_COMMAND:
+            print("📌 /start command received")
+            await self.auth_handler.handle(update, context)
+            return
+        
+        # Step 2: Check verification status
+        is_verified = await self.auth_service.is_user_verified(chat_id)
+        
+        # Step 3: Verified users → always chat
+        if is_verified:
+            print(f"💬 Chat message from verified user {chat_id}")
+            await self.chat_handler.handle(update, context)
+            return
+        
+        # Step 4: Unverified users - check verify format
+        if self.is_verify_format(text)[0]:
+            _, user_id, invite_key = self.is_verify_format(text)
+            print(f"🔐 Verification attempt: user_id={user_id}")
+            await self.verify_handler.handle(update, context, user_id, invite_key)
         else:
-            await self.echo(update, context)
+            # Step 5: Not verified + wrong format → chat_handler rejects
+            print(f"💬 Chat message from unverified user {chat_id}")
+            await self.chat_handler.handle(update, context)
+
 
 zalo_bot = ZaloBotManager(token=Config.ZALO_TOKEN)
 
@@ -59,13 +76,16 @@ zalo_bot = ZaloBotManager(token=Config.ZALO_TOKEN)
 async def zalo_webhook(request: Request):
     try:
         data = await request.json()
-        print(f"📥 Received data: {data}")
+        print(f"📥 Received webhook: {data}")
+        
         event_data = data.get("result", data)
         update = Update.de_json(event_data, zalo_bot.bot)
+        
         print(f"📝 Update object: {update}")
         if update.message:
             print(f"👤 Chat ID: {update.message.chat.id}")
             print(f"💬 Text: {update.message.text}")
+        
         await zalo_bot.handle_update(update)
         print("✅ Response sent successfully")
         return {"ok": True}
