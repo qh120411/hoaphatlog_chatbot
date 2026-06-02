@@ -1,3 +1,4 @@
+import re
 from fastapi import FastAPI, Request
 from config.config import Config
 from zalo_bot import Bot, Update
@@ -9,7 +10,8 @@ from services.auth_service import AuthService
 app = FastAPI()
 
 VERIFY_COMMAND = "/start"
-
+USER_ID_PATTERN = re.compile(r"^[A-Za-z0-9_-]+$")
+INVITE_KEY_PATTERN = re.compile(r"^[A-Za-z0-9_-]+$")
 
 class MockContext:
     def __init__(self, bot):
@@ -27,13 +29,20 @@ class ZaloBotManager:
         self.auth_service = AuthService()
     
     def is_verify_format(self, text: str) -> tuple:
-        
+        if not text:
+            return False, None, None
+
         parts = text.strip().split()
-        if len(parts) == 2:
-            user_id, invite_key = parts[0], parts[1]
-            if any(c.isdigit() or c == '-' for c in invite_key):
-                return True, user_id, invite_key
-        return False, None, None
+        if len(parts) != 2:
+            return False, None, None
+
+        user_id, invite_key = parts
+        if not USER_ID_PATTERN.fullmatch(user_id):
+            return False, None, None
+        if not INVITE_KEY_PATTERN.fullmatch(invite_key):
+            return False, None, None
+
+        return True, user_id, invite_key
     
     async def handle_update(self, update: Update):
         context = MockContext(self.bot)
