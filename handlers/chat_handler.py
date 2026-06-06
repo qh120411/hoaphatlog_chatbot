@@ -1,6 +1,6 @@
 import asyncio
 from services.auth_service import AuthService
-from AI.router_client import LLM_Router
+from AI.chat_orchestrator import ChatOrchestrator
 from zalo_bot import Update
 from zalo_bot.constants import ChatAction
 
@@ -8,7 +8,7 @@ class ChatHandler:
     def __init__(self, bot):
         self.bot = bot
         self.auth_service = AuthService()
-        self.llm_router = LLM_Router()
+        self.chat_orchestrator = ChatOrchestrator()
     
     async def show_typing(self, chat_id: str):
         await self.bot.send_chat_action(
@@ -35,7 +35,7 @@ class ChatHandler:
             await self.show_typing(chat_id)
             await asyncio.sleep(1)
             
-            response = await self.llm_router.call_llm(user_text)
+            response = await self.chat_orchestrator.handle(user_text)
             await update.message.reply_text(response)
             print(f"✅Replied to {chat_id}")
             
