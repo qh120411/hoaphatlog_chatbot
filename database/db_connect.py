@@ -1,9 +1,10 @@
 import mysql.connector
 
 class Database:
-    def __init__(self):
+    def __init__(self, dictionary: bool = False):
         self.conn = None
         self.cursor = None
+        self.dictionary = dictionary
 
     def connect(self):
         try:
@@ -14,7 +15,7 @@ class Database:
                 database='logistics_db',
                 charset='utf8mb4'
             )
-            self.cursor = self.conn.cursor()
+            self.cursor = self.conn.cursor(dictionary=self.dictionary)
             print("Connected to database!")
             return self
         except Exception as e:
