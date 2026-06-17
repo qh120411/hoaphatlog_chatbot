@@ -1,4 +1,5 @@
 import hashlib
+from dataclasses import dataclass
 import gspread
 from google.oauth2.service_account import Credentials
 from config.config import Config
@@ -6,11 +7,7 @@ from database.db_connect import Database
 from services.sheet_validator import SheetValidator
 
 
-def build_upsert_sql(
-    table_name: str,
-    columns: tuple[str, ...],
-    key_columns: set[str],
-) -> str:
+def build_upsert_sql( table_name: str, columns: tuple[str, ...], key_columns: set[str], ) -> str:
     columns_sql = ",\n        ".join(columns)
     placeholders = ", ".join(["%s"] * len(columns))
     update_columns = [column for column in columns if column not in key_columns]
@@ -30,16 +27,39 @@ def build_upsert_sql(
         {update_sql},
         updated_at = NOW()
     """
+    
+@dataclass(frozen=True)
+class SheetConfig:
+    table_name: str
+    field_map: tuple[tuple[str, str, str], ...]
+    key_columns: set[str]
+    required_headers: tuple[str, ...] 
+    
+    @property
+    def headers(self) -> tuple[str, ...]:
+        return tuple(header for _, header, _ in self.field_map)
+    
+    @property
+    def columns(self) -> tuple[str, ...]:
+        return tuple(column for column, _, _ in self.field_map) + ("row_hash",)
+    
+    @property
+    def upsert_sql(self) -> str:
+        return build_upsert_sql(
+            self.table_name,
+            self.columns,
+            key_columns=self.key_columns,
+        )
 
 
 class SheetService:
     SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-    VEHICLE_TABLE = "thong_tin_xe"
-    # Keep sheet headers, DB columns, and value type in one place.
+    
+    #Sheet 1: Thông tin xe
     VEHICLE_FIELD_MAP = (
         ("stt", "STT", "stt"),
-        ("bks", "BKS", "text"),
-        ("bks_moi", "BKS mới", "text"),
+        ("bks", "BKS XE cũ", "text"),
+        ("bks_moi", "BKS XE mới", "text"),
 
         ("loai_xe_chung_loai", "Loại xe chủng loại xe", "text"),
         ("loai_xe", "LOẠI XE", "text"),
@@ -54,16 +74,16 @@ class SheetService:
         ("ngay_het_han_dang_kiem", "Ngày hết hạn đăng kiểm", "date"),
 
         ("so_dang_ky", "Số đăng ký", "text"),
-        ("dang_ky_goc", "Đăng ký gốc", "text"),
+        ("dang_ky_goc", "Đăng ký gốc", "date"),
 
-        ("han_gia_han_giay_ngan_hang", "Hạn gia hạn Giấy ngân hàng", "text"),
+        ("han_gia_han_giay_ngan_hang", "Hạn gia hạn Giấy ngân hàng", "date"),
         ("cong_ty_or_ngan_hang", "Công ty or ngân hàng", "text"),
 
         ("han_bao_hiem", "Hạn Bảo hiểm", "date"),
         ("cong_ty_bao_hiem", "Công ty Bảo hiểm", "text"),
 
         ("han_bao_hiem_vc", "Hạn Bảo hiểm VC", "date"),
-        ("cong_ty_bao_hiem_vc", "Công ty Bảo hiểm", "text"),
+        ("cong_ty_bao_hiem_vc", "Công ty Bảo hiểm VC", "text"),
 
         ("han_phu_hieu", "Hạn Phù hiệu", "date"),
         ("thiet_bi_gsht", "Thiết bị GSHT", "text"),
@@ -80,14 +100,45 @@ class SheetService:
         ("khoi_luong_cho_phep_tren_mam_keo_tggt", "Khối lượng cho phép trên mâm kéo/ TGGT", "text"),
         ("khoi_luong_hang_cc_theo_tk_cp_tggt", "Khối lượng hàng CC theo TK/CP TGGT", "text"),
         ("khoi_luong_toan_bo_theo_tk_cp_tggt", "Khối lượng toàn bộ theo TK/CP TGGT", "text"),
-)
+    )
 
-    VEHICLE_HEADERS = tuple(header for _, header, _ in VEHICLE_FIELD_MAP)
-    VEHICLE_COLUMNS = tuple(column for column, _, _ in VEHICLE_FIELD_MAP) + ("row_hash",)
-    VEHICLE_UPSERT_SQL = build_upsert_sql(
-        VEHICLE_TABLE,
-        VEHICLE_COLUMNS,
+    VEHICLE_CONFIG = SheetConfig(
+        table_name="thong_tin_xe",
+        field_map=VEHICLE_FIELD_MAP,
         key_columns={"stt"},
+        required_headers=("STT",),
+    )
+    
+    #Sheet 2: Thông tin rơ móc
+    
+    TRAILER_FIELD_MAP = (
+        ("stt", "STT", "stt"),
+        ("bks_ro_mooc_cu", "BKS RMOOC cũ", "text"),
+        ("bks_ro_mooc_moi", "BKS RMOOC mới", "text"),
+        ("loai_mooc", "Loại mooc", "text"),
+        ("don_vi_quan_ly", "Đơn vị quản lý", "text"),
+        ("nam_san_xuat", "Năm sản xuất", "int"),
+        ("so_khung", "Số khung", "text"),
+        ("so_dang_kiem", "Số đăng kiểm", "text"),
+        ("ngay_het_han_dang_kiem", "Ngày hết hạn đăng kiểm", "date"),
+        ("so_dang_ky", "Số Đăng ký", "text"),
+        ("ngay_het_han", "Ngày hết hạn", "date"),
+        ("ngay_het_han_giay_ngan_hang", "Ngày hết hạn giấy ngân hàng", "date"),
+        ("ngan_hang", "Ngân hàng", "text"),
+        ("ngay_het_han_bao_hiem", "Ngày hết hạn bảo hiểm", "date"),
+        ("cong_ty_bao_hiem", "Công ty Bảo hiểm", "text"),
+        ("loai", "Loại", "text"),
+        ("mau", "Màu", "text"),
+        ("khoi_luong_ban_than", "Khối lượng bản thân", "text"),
+        ("khoi_luong_chuyen_cho", "Khối lượng chuyên chở", "text"),
+        ("hien_trang", "Hiện trạng", "text"),
+    )
+    
+    TRAILER_CONFIG = SheetConfig(
+        table_name="thong_tin_ro_mooc",
+        field_map=TRAILER_FIELD_MAP,
+        key_columns={"stt"},
+        required_headers=("STT",),
     )
 
     @staticmethod
@@ -163,13 +214,14 @@ class SheetService:
         return not any(str(value).strip() for value in row_values)
 
     @staticmethod
-    def build_vehicle_batch(rows: list[dict]) -> list[tuple]:
+    def build_batch(rows: list[dict], config: SheetConfig) -> list[tuple]:
         batch = []
+        key_header = config.required_headers[0]
         for row in rows:
-            if not SheetService.has_vehicle_stt(row):
+            if not str(row.get(key_header) or "").strip():
                 continue
 
-            batch.append(SheetService.build_vehicle_values(row))
+            batch.append(SheetService.build_row_values(row, config))
 
         return batch
 
@@ -178,12 +230,12 @@ class SheetService:
         return bool(str(row.get("STT") or "").strip())
 
     @staticmethod
-    def build_vehicle_values(row: dict) -> tuple:
+    def build_row_values(row: dict, config: SheetConfig) -> tuple:
         values = [
-            SheetService.normalize_vehicle_value(row.get(header), value_type)
-            for _, header, value_type in SheetService.VEHICLE_FIELD_MAP
+            SheetService.normalize_value(row.get(header), value_type)
+            for _, header, value_type in config.field_map
         ]
-        values.append(SheetService.make_vehicle_hash(row))
+        values.append(SheetService.make_row_hash(row, config))
         return tuple(values)
 
     @staticmethod
@@ -209,7 +261,7 @@ class SheetService:
             return None
 
     @staticmethod
-    def normalize_vehicle_value(value, value_type: str):
+    def normalize_value(value, value_type: str):
         # Each sheet value is normalized before it is sent to MySQL.
         if value_type == "stt":
             return SheetService.parse_stt(value)
@@ -220,30 +272,42 @@ class SheetService:
         return SheetValidator.empty_to_none(value)
 
     @staticmethod
-    def make_vehicle_hash(row: dict) -> str:
+    def make_row_hash(row: dict, config: SheetConfig) -> str:
         row_str = "|".join(
             str(row.get(header, "")).strip().upper()
-            for header in SheetService.VEHICLE_HEADERS
+            for header in config.headers
         )
         return hashlib.sha256(row_str.encode("utf-8")).hexdigest()
 
     @staticmethod
-    def sync_vehicle_data(sheet_name: str, header_row: int) -> int:
+    def sync_data(sheet_name: str, header_row: int, config: SheetConfig ) -> int:
         worksheet = SheetService.connect_worksheet(sheet_name)
         rows = SheetService.read_records(
             worksheet,
             header_row,
-            SheetService.VEHICLE_HEADERS,
-            required_headers=("STT",),
+            config.headers,
+            required_headers=config.required_headers,
         )
-        batch = SheetService.build_vehicle_batch(rows)
-
+        batch = SheetService.build_batch(rows, config)
+        
         with Database() as db:
-            db.upsert_many(SheetService.VEHICLE_UPSERT_SQL, batch)
-
-        print(f"Synced {len(batch)} rows to {SheetService.VEHICLE_TABLE}!")
+            db.upsert_many(config.upsert_sql, batch)
+            
+        print(f"Synced {len(batch)} rows to {config.table_name}!")
         return len(batch)
-
+    
     @staticmethod
-    def sync_data(sheet_name: str, header_row: int) -> int:
-        return SheetService.sync_vehicle_data(sheet_name, header_row)
+    def sync_vehicle_data(sheet_name: str, header_row: int) -> int:
+        return SheetService.sync_data(
+            sheet_name,
+            header_row,
+            SheetService.VEHICLE_CONFIG,
+        )
+        
+    @staticmethod
+    def sync_trailer_data(sheet_name: str, header_row: int) -> int:
+        return SheetService.sync_data(
+            sheet_name,
+            header_row,
+            SheetService.TRAILER_CONFIG,
+        )
