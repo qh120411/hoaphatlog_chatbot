@@ -1,6 +1,9 @@
 from data_access.vehicle_data import VehicleDataService
-
+from data_access.trailer_data import TrailerDataService
 TOOL_REGISTRY = {
+    
+    # === XE ===
+    
     "search_vehicle": {
         "description": "Tìm kiếm thông tin mong muốn dựa trên biển số xe hoặc biển số xe mới.",
         "intents" : ["vehicle_lookup", "plate_lookup"],
@@ -142,7 +145,7 @@ TOOL_REGISTRY = {
             "required": ["days"],
             "optional": []
         },
-        "handler": VehicleDataService.get_insurance_due_vehicles
+        "handler": VehicleDataService.get_insurance_due
     },
     
     #chưa nghĩ ra dc intent nào cho tool này, để tạm trống
@@ -227,14 +230,57 @@ TOOL_REGISTRY = {
         "handler": VehicleDataService.get_vehicle_count_by_management_unit
     },
     "get_vehicles_by_bank" : {
-        "description": "Lấy danh sách xe đang thế chấp tại một ngân hàng cụ thể.",
+        "description": "Lấy danh sách xe đang vay tại một ngân hàng cụ thể.",
         "intents" : ["vehicles_by_bank"],
         "args": {
             "required": ["bank_name"],
             "optional": []
         },
         "handler": VehicleDataService.get_vehicles_by_bank
-    }
+    },
+    
+    # === RƠ MÓC === 
+    
+    "search_trailer": {
+        "description": "Tìm kiếm thông tin mong muốn dựa trên biển số rơ moóc.",
+        "intents" : ["trailer_lookup"],
+        "args": {
+            "required": ["plate_number"],
+            "optional": ["fields"]
+        },
+        "output" : {
+            "found": "Có tìm thấy rơ moóc không?",
+            "vehicle" : {
+                "description": "Thông tin về rơ moóc nếu tìm thấy.",  
+                "fields": {
+                    "bks_ro_mooc_cu": "Biển số rơ moóc cũ",
+                    "bks_ro_mooc_moi": "Biển số rơ moóc mới",
+                    "loai": "Loại mooc của công ty nào",
+                    "loai_mooc": "Loại rơ moóc",
+                    "don_vi_quan_ly": "Đơn vị quản lý",
+                    "nam_san_xuat": "Năm sản xuất",
+                    "so_khung": "Số khung",
+                    "so_dang_kiem": "Số đăng kiểm",
+                    "ngay_het_han_dang_kiem": "Ngày hết hạn đăng kiểm",
+                    "so_dang_ky": "Số đăng ký",
+                    "ngay_het_han": "Ngày hết hạn đăng ký",
+                    "ngay_het_han_giay_ngan_hang": "Ngày hết hạn giấy ngân hàng",
+                    "ngan_hang": "Ngân hàng",
+                    "ngay_het_han_bao_hiem": "Ngày hết hạn bảo hiểm",
+                    "cong_ty_bao_hiem": "Công ty bảo hiểm",
+                    "mau": "Màu rơ moóc",
+                    "khoi_luong_ban_than": "Khối lượng bản thân",
+                    "khoi_luong_chuyen_cho": "Khối lượng chuyên chở",
+                    "hien_trang": "Hiện trạng"
+                }
+            }
+        },
+        "handler": TrailerDataService.search_trailer
+    },
+    
+
+
+    
 }
 
 def get_prompt_tools() -> list[dict]:
