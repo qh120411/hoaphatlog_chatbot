@@ -115,6 +115,7 @@ class SheetService:
         ("stt", "STT", "stt"),
         ("bks_ro_mooc_cu", "BKS RMOOC cũ", "text"),
         ("bks_ro_mooc_moi", "BKS RMOOC mới", "text"),
+        ("loai", "Loại", "text"),
         ("loai_mooc", "Loại mooc", "text"),
         ("don_vi_quan_ly", "Đơn vị quản lý", "text"),
         ("nam_san_xuat", "Năm sản xuất", "int"),
@@ -127,7 +128,6 @@ class SheetService:
         ("ngan_hang", "Ngân hàng", "text"),
         ("ngay_het_han_bao_hiem", "Ngày hết hạn bảo hiểm", "date"),
         ("cong_ty_bao_hiem", "Công ty Bảo hiểm", "text"),
-        ("loai", "Loại", "text"),
         ("mau", "Màu", "text"),
         ("khoi_luong_ban_than", "Khối lượng bản thân", "text"),
         ("khoi_luong_chuyen_cho", "Khối lượng chuyên chở", "text"),
@@ -140,7 +140,153 @@ class SheetService:
         key_columns={"stt"},
         required_headers=("STT",),
     )
+    
+    #Sheet kế hoạch đăng kiểm
+    INSPECTION_FIELD_MAP = (
+        ("stt", "STT", "stt"),
+        ("bks_xe_cu", "BKS XE cũ", "text"),
+        ("bks_xe_moi", "BKS XE mới", "text"),
+        ("phan_loai_doi", "Phân loại đội", "text"),
+        ("chung_loai_xe", "Chủng loại xe", "text"),
+        ("han_dang_kiem_xe", "Hạn đăng kiểm", "date"),
+        ("bks_ro_mooc", "BKS RMOOC", "text"),
+        ("chung_loai_mooc", "Chủng loại mooc", "text"),
+        ("han_dang_kiem_ro_mooc", "Hạn đăng kiểm rơ mooc", "date"),
+        ("dang_kiem_tai", "Đăng kiểm tại", "text"),
+        ("ngay_thuc_hien", "Ngày thực hiện", "date"),
+        ("so_luong", "Số lượng", "int"),
+        ("don_gia", "Đơn giá", "text"),
+        ("thanh_tien", "Thành tiền", "text"),
+        ("chi_phi_thuc_hien", "Chi phí thực hiện", "text"),
+        ("tinh_trang_thanh_toan", "Tình trạng thanh toán", "text"),
+        ("ghi_chu", "Ghi chú", "text"),
+    )
+    
+    INSPECTION_CONFIG = SheetConfig(
+        table_name="kh_dang_kiem",
+        field_map=INSPECTION_FIELD_MAP,
+        key_columns={"stt"},
+        required_headers=("STT",),
+    )
 
+    #Ghép xe
+    Ghep_xe_FIELD_MAP = (
+        ("stt", "STT", "stt"),
+        ("bks_xe_cu", "BSỐ XE", "text"),
+        ("bks_xe_moi", "BSỐ XE mới", "text"),
+        ("chung_loai_xe", "CHỦNG LOẠI XE", "text"),
+        ("bks_ro_mooc_cu", "SỐ RMOOC", "text"),
+        ("bks_ro_mooc_moi", "SỐ RMOOC mới", "text"),
+        ("so_cont", "SỐ CONT", "text"),
+        ("loai_cont", "LOẠI CONT", "text"),
+        ("ngay_thay_doi", "NGÀY THAY ĐỔI", "date"),
+        ("ho_ten_lx", "HỌ VÀ TÊN LX", "text"),
+        ("cccd", "CCCD", "text"),
+        ("gplx", "GPLX", "text"),
+        ("sdt", "SỐ ĐT", "text"),
+        ("dv_quan_ly", "ĐV quản lý", "text"),
+        ("nguoi_dieu_hanh", "NGƯỜI ĐIỀU HÀNH", "text"),
+    )
+    
+    GHEP_CONFIG = SheetConfig(
+        table_name="ghep_xe",
+        field_map=Ghep_xe_FIELD_MAP,
+        key_columns={"stt"},
+        required_headers=("STT",),
+    )
+    
+    #Thay dầu
+    Thay_dau_FIELD_MAP = (
+        ("stt", "STT", "stt"),
+        ("bks_xe_cu", "BKS", "text"),
+        ("bks_xe_moi", "BKS2", "text"),
+        ("loai_xe_chung_loai", "Loại xe chủng loại xe", "text"),
+        ("loai_xe", "LOẠI XE", "text"),
+        ("don_vi_quan_ly", "Đơn vị quản lý", "text"),
+        ("mau", "Màu", "text"),
+        ("loai_dau", "Loại dầu", "text"),
+        ("muc_thay_dau", "Mức thay dầu", "text"),
+        ("ngay_thay_dau_gan_nhat", "Ngày thay dầu gần nhất", "date"),
+        ("km_lan_thay_dau_truoc", "KM lần thay dầu trước", "text"),
+        ("km_hien_tai", "KM hiện tại", "text"),
+        ("ngay_cap_nhat", "Ngày cập nhật", "date"),
+        ("km_da_chay", "KM đã chạy", "text"),
+        ("skm_con_lai_den_thay_dau", "Số km còn lại đến thay dầu" , "text"),
+    )
+    
+    THAY_DAU_CONFIG = SheetConfig(
+        table_name="thay_dau",
+        field_map=Thay_dau_FIELD_MAP,
+        key_columns={"stt"},
+        required_headers=("STT",),
+    )
+    
+    #lịch sử bdsc
+    LICH_SU_BDSC_FIELD_MAP = (
+        ("stt", "STT", "stt"),
+        ("bks_xe_cu", "BKS XE cũ", "text"),
+        ("bks_xe_moi", "BKS XE mới", "text"),
+        ("gara", "Gara", "text"),
+        ("ngay_phat_sinh", "Ngày phát sinh", "date"),
+        ("ky_phat_sinh", "Kỳ phát sinh", "text"),
+        ("ten_cs", "Tên CS", "text"),
+        ("noi_dung", "Nội dung", "text"),
+        ("phan_loai_chi_phi", "Phân loại chi phí", "text"),
+        ("tk_14421", "14421", "text"),
+        ("gia_tri_mua_chua_vat", "Giá trị mua (chưa VAT)", "text"),
+        ("gia_tri_mua_da_vat", "Giá trị mua (đã VAT)", "text"),
+        ("thoi_gian_phan_bo", "Thời gian phân bổ", "text"),
+        ("thoi_gian_con_lai", "Thời gian còn lại", "text"),
+        ("gia_tri_con_lai", "Giá trị còn lại", "text"),
+        ("luy_ke_2025", "Lũy kế 2025", "text"),
+        ("luy_ke_2026", "Lũy kế 2026", "text"),
+        ("thang_1", "1/2026", "text"),
+        ("thang_2", "2/2026", "text"),
+        ("thang_3", "3/2026", "text"),
+        ("thang_4", "4/2026", "text"),
+        ("thang_5", "5/2026", "text"),
+        ("thang_6", "6/2026", "text"),
+        ("thang_7", "7/2026", "text"),
+        ("thang_8", "8/2026", "text"),
+        ("thang_9", "9/2026", "text"),  
+        ("thang_10", "10/2026", "text"),
+        ("thang_11", "11/2026", "text"),
+        ("thang_12", "12/2026", "text"),
+    )
+    
+    LICH_SU_BDSC_CONFIG = SheetConfig(
+        table_name="lsu_bdsc",
+        field_map=LICH_SU_BDSC_FIELD_MAP,
+        key_columns={"stt"},
+        required_headers=("STT",),
+    )
+    
+    #kế hoạch
+    KE_HOACH_FIELD_MAP = (
+        ("stt", "STT", "stt"),
+        ("bks", "BKS", "text"),
+        ("tach_5_so", "Tách 5 số", "text"),
+        ("phan_loai_doi", "Phân loại đội", "text"),
+        ("chung_loai", "Chủng loại", "text"),
+        ("ngay_du_kien_thuc_hien", "Ngày dự kiến thực hiện", "date"),
+        ("ngay_thuc_hien", "Ngày thực hiện", "date"),
+        ("noi_dung_sua_chua", "Nội dung sửa chữa", "text"),
+        ("don_vi", "Đơn vị", "text"),
+        ("so_luong", "Số lượng", "int"),
+        ("don_gia", "Đơn giá", "text"),
+        ("thanh_tien", "Thành tiền", "text"),
+        ("chi_phi_thuc_te", "Chi phí thực tế", "text"),
+        ("tinh_trang_thanh_toan", "Tình trạng thanh toán", "text"),
+        ("ghi_chu", "Ghi chú", "text"),
+    )
+    
+    KE_HOACH_CONFIG = SheetConfig(
+        table_name="khbd_sc",
+        field_map=KE_HOACH_FIELD_MAP,
+        key_columns={"stt"},
+        required_headers=("STT",),
+    )
+    
     @staticmethod
     def connect_worksheet(sheet_name: str):
         credentials = Credentials.from_service_account_file(
@@ -218,11 +364,16 @@ class SheetService:
         batch = []
         key_header = config.required_headers[0]
         for row in rows:
-            if not str(row.get(key_header) or "").strip():
+            stt_value = str(row.get(key_header) or "").strip()
+            
+            if not stt_value:
                 continue
-
+            
+            if key_header in ("STT",) and not stt_value.isdigit():
+                continue 
+            
             batch.append(SheetService.build_row_values(row, config))
-
+            
         return batch
 
     @staticmethod
@@ -310,4 +461,44 @@ class SheetService:
             sheet_name,
             header_row,
             SheetService.TRAILER_CONFIG,
+        )
+        
+    @staticmethod
+    def sync_inspection_data(sheet_name: str, header_row: int) -> int:
+        return SheetService.sync_data(
+            sheet_name,
+            header_row,
+            SheetService.INSPECTION_CONFIG,
+        )
+
+    @staticmethod
+    def sync_ghep_data(sheet_name: str, header_row: int) -> int:
+        return SheetService.sync_data(
+            sheet_name,
+            header_row,
+            SheetService.GHEP_CONFIG,
+        )
+        
+    @staticmethod
+    def sync_thay_dau_data(sheet_name: str, header_row: int) -> int:
+        return SheetService.sync_data(
+            sheet_name,
+            header_row,
+            SheetService.THAY_DAU_CONFIG,
+        )
+        
+    @staticmethod
+    def sync_lsu_bdsc_data(sheet_name: str, header_row: int) -> int:
+        return SheetService.sync_data(
+            sheet_name,
+            header_row,
+            SheetService.LICH_SU_BDSC_CONFIG,
+        )
+        
+    @staticmethod
+    def sync_ke_hoach_data(sheet_name: str, header_row: int) -> int:
+        return SheetService.sync_data(
+            sheet_name,
+            header_row,
+            SheetService.KE_HOACH_CONFIG,
         )
