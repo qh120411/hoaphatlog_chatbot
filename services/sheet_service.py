@@ -148,7 +148,7 @@ class SheetService:
         ("bks_xe_moi", "BKS XE mới", "text"),
         ("phan_loai_doi", "Phân loại đội", "text"),
         ("chung_loai_xe", "Chủng loại xe", "text"),
-        ("han_dang_kiem_xe", "Hạn đăng kiểm", "date"),
+        ("han_dang_kiem_xe", "Hạn đăng kiểm xe", "date"),
         ("bks_ro_mooc", "BKS RMOOC", "text"),
         ("chung_loai_mooc", "Chủng loại mooc", "text"),
         ("han_dang_kiem_ro_mooc", "Hạn đăng kiểm rơ mooc", "date"),
