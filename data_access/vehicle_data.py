@@ -230,7 +230,7 @@ class VehicleDataService:
     
     @staticmethod
     #Đơn vị nào có nhiều xe sắp đăng kiểm nhất trong ... ngày tới/ tháng sau?
-    def get_inspection_due_top_unit(day: int = 7 ) -> list[dict[str, Any]] | dict[str, Any]:
+    def get_inspection_due_top_unit(days: int = 7 ) -> list[dict[str, Any]] | dict[str, Any]:
         try:
             day = min(max(1, int(day)), 365)
             with Database(dictionary=True) as db:
@@ -562,8 +562,144 @@ class VehicleDataService:
                 "error": str(exc),
             }
                 
+    MISSING_GROUPS = {
+        "bks": ["bks", "bks_moi"],
+        "dang_kiem": ["so_dang_kiem", "ngay_het_han_dang_kiem"],
+        "bao_hiem": ["han_bao_hiem", "cong_ty_bao_hiem"],
+        "bao_hiem_vc": ["han_bao_hiem_vc", "cong_ty_bao_hiem_vc"],
+        "ngan_hang": ["han_gia_han_giay_ngan_hang", "cong_ty_or_ngan_hang"],
+        "phu_hieu": ["han_phu_hieu"],
+        "camera": ["ngay_het_han_camera", "camera_giam_sat"],
+    }
+
+    DUE_FIELDS = {
+        "dang_kiem": ("ngay_het_han_dang_kiem", "so_dang_kiem"),
+        "bao_hiem": ("han_bao_hiem", "cong_ty_bao_hiem"),
+        "bao_hiem_vc": ("han_bao_hiem_vc", "cong_ty_bao_hiem_vc"),
+        "ngan_hang": ("han_gia_han_giay_ngan_hang", "cong_ty_or_ngan_hang"),
+        "phu_hieu": ("han_phu_hieu", "''"),
+        "camera": ("ngay_het_han_camera", "camera_giam_sat"),
+    }
+
     @staticmethod
-    #Lấy ra có bao nhiêu xe 
+    def _fetch(sql: str, params: tuple = ()) -> list[dict[str, Any]] | dict[str, Any]:
+        try:
+            with Database(dictionary=True) as db:
+                db.cursor.execute(sql, params)
+                return db.cursor.fetchall()
+        except Exception as exc:
+            return {"found": False, "error": str(exc)}
+
+    @staticmethod
+    # Xe nao chua co thong tin cua bks, dang kiem, bao hiem, ngan hang...
+    def get_missing_vehicle_info(info_type: str = "all") -> list[dict[str, Any]] | dict[str, Any]:
+        all_cols = sorted({c for cols in VehicleDataService.MISSING_GROUPS.values() for c in cols})
+        cols = all_cols if info_type == "all" else VehicleDataService.MISSING_GROUPS.get(info_type, [info_type])
+        cols = [c for c in cols if c in all_cols]
+
+        if not cols:
+            return {"found": False, "message": "Thong tin can kiem tra khong hop le"}
+
+        union_sql = " UNION ALL ".join(
+            f"""
+            SELECT bks, bks_moi, loai_xe_chung_loai, don_vi_quan_ly, '{col}' AS cot_trong
+            FROM thong_tin_xe
+            WHERE {col} IS NULL OR TRIM(CAST({col} AS CHAR)) = ''
+            """
+            for col in cols
+        )
+
+        sql = f"""
+            SELECT
+                bks,
+                bks_moi,
+                loai_xe_chung_loai,
+                don_vi_quan_ly,
+                cot_trong,
+                COUNT(*) OVER(PARTITION BY cot_trong) AS so_luong
+            FROM ({union_sql}) AS t
+            ORDER BY cot_trong ASC, bks ASC
+        """
+        return VehicleDataService._fetch(sql)
+
+    @staticmethod
+    # Dem va lay xe theo tuoi xe hoac nam san xuat
+    def get_vehicles_by_age_or_year(
+        value: int,
+        filter_type: str = "tuoi_xe",
+        comparison: str = "tren",
+    ) -> list[dict[str, Any]] | dict[str, Any]:
+        operators = {
+            "tren": ">",
+            "duoi": "<",
+            "duoc": "=",
+            "bang": "=",
+            "truoc": "<",
+            "sau": ">",
+            "vao": "=",
+        }
+        operator = operators.get(comparison, "=")
+        compare_expr = "YEAR(CURDATE()) - nam_sx" if filter_type == "tuoi_xe" else "nam_sx"
+
+        sql = f"""
+            SELECT
+                bks,
+                bks_moi,
+                loai_xe_chung_loai,
+                loai_xe,
+                don_vi_quan_ly,
+                nam_sx,
+                YEAR(CURDATE()) - nam_sx AS tuoi_xe,
+                COUNT(*) OVER() AS so_luong
+            FROM thong_tin_xe
+            WHERE nam_sx IS NOT NULL
+              AND {compare_expr} {operator} %s
+            ORDER BY nam_sx ASC, bks ASC
+        """
+        return VehicleDataService._fetch(sql, (int(value),))
+
+    @staticmethod
+    # Xe co dang kiem, bao hiem, ngan hang, phu hieu... sap het han trong N ngay toi
+    def get_vehicle_due_items(document_type: str = "all", days: int = 30) -> list[dict[str, Any]] | dict[str, Any]:
+        keys = list(VehicleDataService.DUE_FIELDS) if document_type == "all" else [document_type]
+        keys = [k for k in keys if k in VehicleDataService.DUE_FIELDS]
+
+        if not keys:
+            return {"found": False, "message": "Loai han can kiem tra khong hop le"}
+
+        union_sql = " UNION ALL ".join(
+            f"""
+            SELECT
+                bks,
+                bks_moi,
+                loai_xe_chung_loai,
+                '{key}' AS loai_han,
+                {info_col} AS thong_tin_lien_quan,
+                {date_col} AS ngay_den_han,
+                DATEDIFF({date_col}, CURDATE()) AS so_ngay_con_lai
+            FROM thong_tin_xe
+            WHERE {date_col} >= CURDATE()
+              AND {date_col} <= DATE_ADD(CURDATE(), INTERVAL %s DAY)
+            """
+            for key, (date_col, info_col) in VehicleDataService.DUE_FIELDS.items()
+            if key in keys
+        )
+
+        sql = f"""
+            SELECT
+                bks,
+                bks_moi,
+                loai_xe_chung_loai,
+                loai_han,
+                thong_tin_lien_quan,
+                ngay_den_han,
+                so_ngay_con_lai,
+                COUNT(*) OVER(PARTITION BY loai_han) AS so_luong
+            FROM ({union_sql}) AS t
+            ORDER BY ngay_den_han ASC, bks ASC
+        """
+        days = min(max(1, int(days)), 365)
+        return VehicleDataService._fetch(sql, tuple([days] * len(keys)))
             
     @staticmethod
     def normalize_fields(fields: list[str] | str | None, row: dict[str, Any]) -> list[str]:
