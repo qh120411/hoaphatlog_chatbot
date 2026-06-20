@@ -245,14 +245,14 @@ TOOL_REGISTRY = {
     },
     
     "get_vehicles_by_age_or_year": {
-        "description": "Lay danh sach va so luong xe theo tuoi xe hoac nam san xuat.",
+        "description":  "Lấy danh sách và số lượng xe theo tuổi xe hoặc năm sản xuất.",
         "intents": ["vehicles_by_age_or_year"],
         "args": {"required": ["value"], "optional": ["filter_type", "comparison"]},
         "handler": VehicleDataService.get_vehicles_by_age_or_year,
     },
     
     "get_vehicles_by_unit": {
-        "description": "Lay danh sach xe theo don vi quan ly.",
+        "description": "Lấy danh sách xe theo đơn vị quản lý. Nếu người dùng hỏi về một đơn vị cụ thể thì truyền tên đơn vị vào unit_name, nếu người dùng hỏi về tất cả đơn vị thì để trống unit_name hoặc truyền all vào unit_name",
         "intents": ["vehicles_by_unit"],
         "args": {"required": ["unit_name"], "optional": []},
         "handler": VehicleDataService.get_vehicles_by_unit,
@@ -298,7 +298,7 @@ TOOL_REGISTRY = {
         "handler": TrailerDataService.search_trailer
     },
     "get_missing_vehicle_info": {
-        "description": "Lay danh sach xe chua co thong tin hoac dang thieu thong tin.",
+        "description": "Lấy danh sách xe chưa có thông tin hoặc đang thiếu thông tin",
         "intents": ["missing_vehicle_info"],
         "args": {
             "required": [],
@@ -309,7 +309,7 @@ TOOL_REGISTRY = {
 
 
     "get_vehicle_due_items": {
-        "description": "Lay danh sach cac muc cua xe sap het han trong N ngay toi.",
+        "description": "Lấy danh sách các mục của xe sắp hết hạn trong N ngày tới.",
         "intents": ["vehicle_due_items"],
         "args": {
             "required": [],
@@ -319,67 +319,67 @@ TOOL_REGISTRY = {
     },
     
     "get_inspection_trailer": {
-        "description": "Lay danh sach ro mooc sap het han dang kiem trong N ngay toi.",
+        "description": "Lấy danh sách rơ mooc sắp hết hạn đăng kiểm trong N ngày tới.",
         "intents": ["trailer_inspection_due"],
         "args": {"required": [], "optional": ["days"]},
         "handler": TrailerDataService.get_inspection_trailer,
     },
     "get_trailer_inspection_due_top_unit": {
-        "description": "Lay don vi co nhieu ro mooc sap het han dang kiem nhat trong N ngay toi.",
+        "description": "Lấy đơn vị quản lý có nhiều rơ mooc sắp hết hạn đăng kiểm nhất trong N ngày tới.",
         "intents": ["trailer_inspection_due_top_unit"],
         "args": {"required": [], "optional": ["day"]},
         "handler": TrailerDataService.get_trailer_inspection_due_top_unit,
     },
     "get_trailer_bank_extension": {
-        "description": "Lay thong tin gia han giay ngan hang cua ro mooc theo bien so.",
+        "description": "Lấy thông tin gia hạn giấy ngân hàng của rơ mooc theo biển số",
         "intents": ["trailer_bank_extension_lookup"],
         "args": {"required": ["plate_number"], "optional": []},
         "handler": TrailerDataService.get_trailer_bank_extension,
     },
     "get_trailer_by_bank": {
-        "description": "Lay danh sach ro mooc dang vay tai mot ngan hang.",
+        "description": "Lấy danh sách rơ mooc hiện đang vay tại một ngân hàng cụ thể",
         "intents": ["trailers_by_bank"],
         "args": {"required": ["bank_name"], "optional": []},
         "handler": TrailerDataService.get_trailer_by_bank,
     },
     "get_trailer_by_insurance_company": {
-        "description": "Lay danh sach ro mooc theo cong ty bao hiem.",
+        "description": "Lấy danh sách rơ mooc theo công ty bảo hiểm cụ thể",
         "intents": ["trailers_by_insurance_company"],
         "args": {"required": ["insurance_company"], "optional": []},
         "handler": TrailerDataService.get_trailer_by_insurance_company,
     },
     "get_trailer_count_by_management_unit": {
-        "description": "Dem so luong ro mooc theo don vi quan ly.",
+        "description": "Đếm số lượng rơ mooc theo đơn vị quản lý",
         "intents": ["trailer_count_by_management_unit"],
         "args": {"required": [], "optional": ["units"]},
         "handler": TrailerDataService.get_trailer_count_by_management_unit,
     },
     "get_trailer_by_managemein_unit": {
-        "description": "Lay danh sach ro mooc theo don vi quan ly.",
+        "description": "Lấy danh sách rơ mooc theo đơn vị quản lý",
         "intents": ["trailers_by_management_unit"],
         "args": {"required": ["unit"], "optional": []},
         "handler": TrailerDataService.get_trailer_by_managemein_unit,
     },
     "get_inactive_trailers": {
-        "description": "Lay danh sach ro mooc khong hoat dong hoac dang nam bai.",
+        "description": "Lấy danh sách rơ mooc không hoạt động hoặc đang nằm bãi",
         "intents": ["inactive_trailers"],
         "args": {"required": [], "optional": []},
         "handler": TrailerDataService.get_inactive_trailers,
     },
     "get_trailers_by_age_or_year": {
-        "description": "Lay danh sach va so luong ro mooc theo tuoi mooc hoac nam san xuat.",
+        "description": "Lấy danh sách và số lượng rơ mooc theo tuổi mooc hoặc năm sản xuất.",
         "intents": ["trailers_by_age_or_year"],
         "args": {"required": ["value"], "optional": ["filter_type", "comparison"]},
         "handler": TrailerDataService.get_trailers_by_age_or_year,
     },
     "get_trailer_due_items": {
-        "description": "Lay cac muc sap het han cua ro mooc nhu dang kiem, dang ky, bao hiem, ngan hang.",
+        "description": "Lấy các mục sắp hết hạn của rơ mooc như đăng kiểm, đăng ký, bảo hiểm, ngân hàng, ...",
         "intents": ["trailer_due_items"],
         "args": {"required": [], "optional": ["document_type", "days", "plate_number"]},
         "handler": TrailerDataService.get_trailer_due_items,
     },
     "get_trailer_insurance_due": {
-        "description": "Lay danh sach ro mooc sap het han bao hiem trong N ngay toi.",
+        "description": "Lấy danh sách rơ mooc sắp hết hạn bảo hiểm trong N ngày tới.",
         "intents": ["trailer_insurance_due"],
         "args": {"required": [], "optional": ["days"]},
         "handler": TrailerDataService.get_trailer_insurance_due,
@@ -387,55 +387,55 @@ TOOL_REGISTRY = {
     
     # === GHEP XE - missing from pair_data.py ===
     "get_pair_data": {
-        "description": "Lay thong tin ghep xe, ro mooc, cont va lai xe theo bien so.",
+        "description": "Lấy thông tin về xe, rơ mooc, cont và họ tên lái xe theo biển số",
         "intents": ["pair_lookup"],
         "args": {"required": ["plate_number"], "optional": ["fields"]},
         "handler": PairDataService.get_pair_data,
     },
     "get_data_by_name": {
-        "description": "Lay thong tin xe, ro mooc, cont theo ten lai xe.",
+        "description": "Lấy thông tin xe, rơ mooc, cont theo tên lái xe.",
         "intents": ["pair_by_driver_name"],
         "args": {"required": ["name"], "optional": []},
         "handler": PairDataService.get_data_by_name,
     },
     "get_pair_by_cont": {
-        "description": "Lay thong tin xe va ro mooc dang ghep voi so cont.",
+        "description": "Lấy thông tin xe, rơ mooc đang ghép với số container cụ thể.",
         "intents": ["pair_by_cont"],
         "args": {"required": ["cont_number"], "optional": []},
         "handler": PairDataService.get_pair_by_cont,
     },
     "get_driver_info": {
-        "description": "Lay thong tin lai xe theo bien so xe hoac ro mooc.",
+        "description": "Lấy thông tin của người lái xe theo biển số xe hoặc biển số rơ mooc.",
         "intents": ["driver_info_by_vehicle_or_trailer"],
         "args": {"required": [], "optional": ["plate_number", "mooc_number"]},
         "handler": PairDataService.get_driver_info,
     },
     "get_info_by_name": {
-        "description": "Lay thong tin ca nhan lai xe theo ten.",
+        "description": "Lấy thông tin cá nhân của lái xe dựa trên họ và tên của lái xe.",
         "intents": ["driver_info_by_name"],
         "args": {"required": ["name"], "optional": []},
         "handler": PairDataService.get_info_by_name,
     },
     "get_pair_by_vehicle": {
-        "description": "Lay thong tin xe dang ghep voi ro mooc nao, cont nao va ai lai.",
+        "description": "Lấy thông tin xe đang ghép với rơ mooc nào, cont nào và họ tên người lái xe",
         "intents": ["pair_by_vehicle"],
         "args": {"required": ["plate_number"], "optional": []},
         "handler": PairDataService.get_pair_by_vehicle,
     },
     "get_pair_by_ro_mooc_or_cont": {
-        "description": "Lay thong tin ro mooc hoac cont dang ghep voi xe nao va ai su dung.",
+        "description": "Lấy thông tin rơ mooc hoặc cont đang ghép với xe nào và ai là người lái xe/ sử dụng",
         "intents": ["pair_by_ro_mooc_or_cont"],
         "args": {"required": [], "optional": ["ro_mooc_number", "cont_number"]},
         "handler": PairDataService.get_pair_by_ro_mooc_or_cont,
     },
     "get_latest_pair_change": {
-        "description": "Lay lan thay doi gan nhat va cac thong tin da thay doi so voi lan truoc.",
+        "description": "Lấy lần thay đổi gần nhất và các thông tin đã thay đổi so với lần trước.",
         "intents": ["latest_pair_change"],
         "args": {"required": [], "optional": ["value", "plate_number", "ro_mooc_number", "cont_number"]},
         "handler": PairDataService.get_latest_pair_change,
     },
     "get_vehicle_changes_by_period": {
-        "description": "Lay danh sach xe co thay doi thong tin trong thang hoac khoang thoi gian nhat dinh.",
+        "description": "Lấy danh sách xe có thay đổi thông tin trong tháng hoặc không thời gian nhất định",
         "intents": ["vehicle_changes_by_period"],
         "args": {"required": [], "optional": ["period", "from_date", "to_date"]},
         "handler": PairDataService.get_vehicle_changes_by_period,
@@ -443,55 +443,55 @@ TOOL_REGISTRY = {
 
     # === KE HOACH DANG KIEM - missing from plan_inspec_data.py ===
     "check_vehicle_inspection": {
-        "description": "Kiem tra xe chua thuc hien dang kiem.",
+        "description": "Kiểm tra xe chưa thực hiện đăng kiểm theo kế hoạch đăng kiểm tháng này.",
         "intents": ["check_vehicle_inspection"],
         "args": {"required": [], "optional": []},
         "handler": PlanInspecDataService.check_vehicle_inspection,
     },
     "check_trailer_inspection": {
-        "description": "Kiem tra ro mooc chua thuc hien dang kiem.",
+        "description": "Kiểm tra rơ mooc chưa thực hiện đăng kiểm theo kế hoạch đăng kiểm tháng này",
         "intents": ["check_trailer_inspection"],
         "args": {"required": [], "optional": []},
         "handler": PlanInspecDataService.check_trailer_inspection,
     },
     "check_vehicle_inspection_time": {
-        "description": "Kiem tra xe chua thuc hien dang kiem theo ke hoach thang nay.",
+        "description": "Kiểm tra xe chưa thực hiện đăng kiểm theo kế hoạch đăng kiểm tháng này và thời gian thực hiện đăng kiểm.",
         "intents": ["check_vehicle_inspection_time"],
         "args": {"required": [], "optional": []},
         "handler": PlanInspecDataService.check_vehicle_inspection_time,
     },
     "check_trailer_inspection_time": {
-        "description": "Kiem tra ro mooc chua thuc hiện dang kiem theo ke hoach tháng nay.",
+        "description": "Kiểm tra rơ mooc chưa thực hiện đăng kiểm theo kế hoạch đăng kiểm tháng này.",
         "intents": ["check_trailer_inspection_time"],
         "args": {"required": [], "optional": []},
         "handler": PlanInspecDataService.check_trailer_inspection_time,
     },
     "check_vehicle_inspection_plan": {
-        "description": "Kiem tra danh sach da thuc hien dang kiem theo ke hoach tháng này.",
+        "description": "Kiểm tra danh sách xe đã thực hiện đăng kiểm theo kế hoạch đăng kiểm tháng này.",
         "intents": ["check_vehicle_inspection_plan"],
         "args": {"required": [], "optional": []},
         "handler": PlanInspecDataService.check_vehicle_inspection_plan,
     },
     "check_inspection_plan": {
-        "description": "Kiem tra xe va ro mooc da thuc hien dang kiem theo ke hoach tháng này.",
+        "description": "Kiểm tra xe va rơ mooc đã thực hiện đăng kiểm theo kế hoạch tháng này.",
         "intents": ["check_inspection_plan"],
         "args": {"required": [], "optional": []},
         "handler": PlanInspecDataService.check_inspection_plan,
     },
     "get_sum_cost": {
-        "description": "Tinh tong chi phi dang kiem da thuc hien trong thang nay.",
+        "description": "Tính tổng chi phí thực hiện đăng kiểm theo kế hoạch tháng này.",
         "intents": ["inspection_sum_cost"],
         "args": {"required": [], "optional": []},
         "handler": PlanInspecDataService.get_sum_cost,
     },
     "compare_cost_with_plan": {
-        "description": "So sanh tong chi phi thuc hien voi ke hoach dang kiem.",
+        "description": "So sánh tổng chi phí thực hiện với kế hoạch đăng kiểm.",
         "intents": ["inspection_compare_cost_with_plan"],
         "args": {"required": [], "optional": []},
         "handler": PlanInspecDataService.compare_cost_with_plan,
     },
     "count_cost_comparison": {
-        "description": "Dem xe va ro mooc co chi phi thuc hien cao hon, thap hon hoac bang ke hoach.",
+        "description": "Đếm xe và rơ mooc có chi phí thực hiện cao hơn, thấp hơn hoặc bằng kế hoạch.",
         "intents": ["inspection_count_cost_comparison"],
         "args": {"required": [], "optional": []},
         "handler": PlanInspecDataService.count_cost_comparison,
@@ -512,55 +512,55 @@ TOOL_REGISTRY = {
 
     # === KE HOACH BAO DUONG SUA CHUA - missing from khbd_data.py ===
     "get_vehicle_due": {
-        "description": "Lay danh sach xe can bao duong sua chua trong N ngay toi.",
+        "description": "Lấy danh sách xe cần bảo dưỡng sửa chữa trong N ngày tới",
         "intents": ["maintenance_vehicle_due"],
         "args": {"required": [], "optional": ["days"]},
         "handler": KhbdDataService.get_vehicle_due,
     },
     "get_recently_serviced": {
-        "description": "Lay danh sach xe da sua chua trong tuan nay hoac thang nay.",
+        "description": "Lấy danh sách xe đã sửa chữa trong tuần này hoặc tháng này.",
         "intents": ["recently_serviced"],
         "args": {"required": [], "optional": ["period"]},
         "handler": KhbdDataService.get_recently_serviced,
     },
     "get_not_serviced": {
-        "description": "Lay danh sach xe chua sua chua trong tuan nay hoac thang nay.",
+        "description": "Lấy danh sách xe chưa sửa chữa trong tuần này hoặc tháng này.",
         "intents": ["not_serviced"],
         "args": {"required": [], "optional": ["period"]},
         "handler": KhbdDataService.get_not_serviced,
     },
     "get_cost_discrepancy": {
-        "description": "Lay cac xe co chi phi thuc te nho hon hoac lon hon thanh tien.",
+        "description": "Lấy các xe có chi phí thực tế nhỏ hơn hoặc lớn hơn giá thành tiền.",
         "intents": ["maintenance_cost_discrepancy"],
         "args": {"required": [], "optional": ["comparison"]},
         "handler": KhbdDataService.get_cost_discrepancy,
     },
     "get_team_with_highest_cost": {
-        "description": "Lay doi xe co tong chi phi thuc hien lon nhat.",
+        "description": "Lấy đội xe có tổng chi phí thực hiện lớn nhất",
         "intents": ["team_with_highest_cost"],
         "args": {"required": [], "optional": []},
         "handler": KhbdDataService.get_team_with_highest_cost,
     },
     "get_team_with_most_vehicles": {
-        "description": "Lay doi xe co so luong xe can sua chua nhieu nhat trong tuan hoac thang.",
+        "description": "Lấy đội xe có số lượng xe cần sữa chữa nhiều nhất trong tuần hoặc tháng",
         "intents": ["team_with_most_vehicles"],
         "args": {"required": [], "optional": ["period"]},
         "handler": KhbdDataService.get_team_with_most_vehicles,
     },
     "get_total_actual_cost": {
-        "description": "Tinh tong chi phi thuc te cua ke hoach bao duong sua chua.",
+        "description": "Tính tổng chi phí thực tế của kế hoạch bảo dưỡng sửa chữa.",
         "intents": ["total_actual_cost"],
         "args": {"required": [], "optional": []},
         "handler": KhbdDataService.get_total_actual_cost,
     },
     "get_registration_cost_difference": {
-        "description": "Tinh chenh lech giua thanh tien va chi phi thuc hien.",
+        "description": "Tính chênh lệch giữa thành tiền và chi phí thực hiện",
         "intents": ["registration_cost_difference"],
         "args": {"required": [], "optional": []},
         "handler": KhbdDataService.get_registration_cost_difference,
     },
     "get_vehicle_repairs_this_month": {
-        "description": "Lay danh sach xe trong thang nay co sua chua gi.",
+        "description": "Lấy danh sách xe tron tháng này có sửa chữa gì.",
         "intents": ["vehicle_repairs_this_month"],
         "args": {"required": ["bks"], "optional": []},
         "handler": KhbdDataService.get_vehicle_repairs_this_month,
@@ -568,49 +568,49 @@ TOOL_REGISTRY = {
 
     # === THAY DAU - missing from thaydau.py ===
     "get_name_oil_by_plate": {
-        "description": "Lay thong tin loai dau theo bien so xe.",
+        "description": "Lấy thông tin loại dầu theo biển số xe",
         "intents": ["oil_name_by_plate"],
         "args": {"required": ["plate_number"], "optional": []},
         "handler": PlanChangeOilDataService.get_name_oil_by_plate,
     },
     "get_scl_by_plate": {
-        "description": "Lay so km con lai den thay dau theo bien so xe.",
+        "description": "Lấy số km còn lại đến thay dầu theo biển số xe",
         "intents": ["oil_remaining_km_by_plate"],
         "args": {"required": ["plate_number"], "optional": []},
         "handler": PlanChangeOilDataService.get_scl_by_plate,
     },
     "get_near_date_by_plate": {
-        "description": "Lay ngay thay dau gan nhat theo bien so xe.",
+        "description": "Lấy ngày thay dầu gàn nhất theo biển số xe",
         "intents": ["oil_nearest_date_by_plate"],
         "args": {"required": ["plate_number"], "optional": []},
         "handler": PlanChangeOilDataService.get_near_date_by_plate,
     },
     "get_vehicle_by_scl": {
-        "description": "Lay danh sach xe con so km den thay dau nho hon hoac bang moc cho truoc.",
+        "description": "Lấy danh sách xe còn số km đến thay dầu nhỏ hơn hoặc bằng một giá trị cụ thể.",
         "intents": ["vehicles_by_remaining_oil_km"],
         "args": {"required": ["scl"], "optional": []},
         "handler": PlanChangeOilDataService.get_vehicle_by_scl,
     },
     "get_km_since_last_oil_change": {
-        "description": "Lay so km xe da chay tu lan thay dau gan nhat theo bien so.",
+        "description": "Lấy số km xe đã chạy từ lần thay dầu gần nhất theo biển số xe.",
         "intents": ["km_since_last_oil_change"],
         "args": {"required": ["plate_number"], "optional": []},
         "handler": PlanChangeOilDataService.get_km_since_last_oil_change,
     },
     "get_vehicles_by_km_since_last_oil_change": {
-        "description": "Lay danh sach xe da chay tren N km tu lan thay dau gan nhat.",
+        "description": "Lấy danh sách xe đã chạy trên N km kể từ lần thay dầu gần nhất.",
         "intents": ["vehicles_by_km_since_last_oil_change"],
         "args": {"required": ["km"], "optional": []},
         "handler": PlanChangeOilDataService.get_vehicles_by_km_since_last_oil_change,
     },
     "get_oil_change_count_by_management_unit": {
-        "description": "Dem so xe theo don vi quan ly con N km den thay dau.",
+        "description": "Đếm số xe theo đơn vị quản lý còn N km đến thay dầu.",
         "intents": ["oil_change_count_by_management_unit"],
         "args": {"required": [], "optional": ["units", "skm_con_lai"]},
         "handler": PlanChangeOilDataService.get_oil_change_count_by_management_unit,
     },
     "get_oil_change_vehicles_by_management_unit": {
-        "description": "Lay danh sach xe theo don vi quan ly da chay tren N km tu lan thay dau gan nhat.",
+        "description": "Lấy danh sách xe theo đơn vị quản lý đã chạy trên N km kể từ lần thay dầu gần nhất.",
         "intents": ["oil_change_vehicles_by_management_unit"],
         "args": {"required": ["units", "km"], "optional": []},
         "handler": PlanChangeOilDataService.get_oil_change_vehicles_by_management_unit,
