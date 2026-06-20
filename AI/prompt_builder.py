@@ -79,27 +79,28 @@ class PromptBuilder:
             Quy ước thời gian bắt buộc:
             - "hôm nay" = ngày hiện tại.
             - "tuần này", "trong tuần này" = từ Thứ Hai của tuần hiện tại đến Chủ Nhật của tuần hiện tại.
-            - "tháng này", "trong tháng này", "tháng hiện tại" không bao giờ là 30 ngày gần nhất.
-            - Nếu hỏi dữ liệu đã xảy ra/thống kê trong tháng này: hiểu là từ ngày 01 của tháng hiện tại đến hôm nay.
-            - Nếu hỏi dữ liệu sắp hết hạn/cần làm trong tháng này: hiểu là từ hôm nay đến ngày cuối cùng của tháng hiện tại.
-            - Nếu tool hỗ trợ period thì truyền period="thang_nay" cho "tháng này".
-            - Nếu tool hỗ trợ from_date/to_date thì truyền ngày cụ thể dạng YYYY-MM-DD.
-            - Nếu tool chỉ hỗ trợ days cho câu hỏi "trong tháng này", days phải là số ngày từ hôm nay đến cuối tháng, không dùng 30.
-            - Chỉ dùng days=30 khi người dùng nói rõ "30 ngày", "1 tháng tới", "trong 30 ngày tới", hoặc câu hỏi thời gian thật sự mơ hồ mà tool bắt buộc dùng days.
-            - "tuần trước" = tuần lịch ngay trước tuần hiện tại, không phải 7 ngày gần nhất nếu người dùng hỏi thống kê.
-            - "tuần sau" = tuần lịch ngay sau tuần hiện tại.
-            - "tháng trước" = từ ngày 01 của tháng trước đến ngày cuối tháng trước.
-            - "tháng sau" = từ ngày 01 của tháng sau đến ngày cuối tháng sau.
-            - "năm nay" = từ ngày 01/01 của năm hiện tại đến 31/12 của năm hiện tại.
+            - "tuần trước" = từ Thứ Hai của tuần lịch ngay trước tuần hiện tại đến Chủ Nhật của tuần đó, không phải 7 ngày gần nhất.
+            - "tuần sau" = từ Thứ Hai của tuần lịch ngay sau tuần hiện tại đến Chủ Nhật của tuần đó.
 
-            Quy ước period:
-            - tuần này -> period="tuan_nay"
-            - tháng này -> period="thang_nay"
-            - tháng trước -> period="thang_truoc"
-            - quý này -> period="quy_nay"
-            - năm nay -> period="nam_nay"
-            - Nếu tool chỉ chấp nhận "week"/"month" thì dùng "week" cho tuần này và "month" cho tháng này.
-            - Nếu tool chỉ chấp nhận "tuần"/"tháng" thì dùng "tuần" cho tuần này và "tháng" cho tháng này.
+            - "7 ngày tới", "trong 7 ngày tới" = từ hôm nay đến hôm nay + 7 ngày.
+            - "7 ngày qua", "7 ngày gần đây", "7 ngày trước" = từ hôm nay - 7 ngày đến hôm nay.
+
+            - "tháng này", "trong tháng này", "tháng hiện tại" không bao giờ được hiểu là 30 ngày gần nhất.
+            - Nếu hỏi dữ liệu đã xảy ra, lịch sử, báo cáo hoặc thống kê trong tháng này: hiểu là từ ngày 01 của tháng hiện tại đến hôm nay.
+            - Nếu hỏi dữ liệu sắp hết hạn, sắp đến hạn, cần làm hoặc phát sinh trong tương lai trong tháng này: hiểu là từ hôm nay đến ngày cuối cùng của tháng hiện tại.
+            - "tháng trước" = từ ngày 01 của tháng trước đến ngày cuối cùng của tháng trước.
+            - "tháng sau" = từ ngày 01 của tháng sau đến ngày cuối cùng của tháng sau.
+
+            - "năm nay" = từ ngày 01/01 của năm hiện tại đến ngày 31/12 của năm hiện tại.
+
+            - Nếu tool hỗ trợ period thì truyền period="thang_nay" cho các câu hỏi "tháng này".
+            - Nếu tool hỗ trợ from_date/to_date thì ưu tiên truyền ngày cụ thể dạng YYYY-MM-DD.
+            - Nếu tool chỉ hỗ trợ days cho câu hỏi "trong tháng này", days phải được tính theo ngữ cảnh:
+                + Với dữ liệu đã xảy ra/thống kê: số ngày từ ngày 01 của tháng hiện tại đến hôm nay.
+                + Với dữ liệu sắp hết hạn/cần làm: số ngày từ hôm nay đến cuối tháng.
+            - Không dùng days=30 cho "tháng này".
+            - Chỉ dùng days=30 khi người dùng nói rõ "30 ngày", "trong 30 ngày tới", hoặc câu hỏi thời gian thật sự mơ hồ mà tool bắt buộc phải dùng days.
+
 
             Quy tắc chọn tool:
             - Chỉ dùng tool có trong danh sách tool được backend cung cấp.
@@ -152,7 +153,7 @@ class PromptBuilder:
 
             Quy tắc trả lời:
             - Trả lời ngắn gọn, rõ ý, đi thẳng vào kết quả.
-            - Nếu có nhiều dòng dữ liệu, trình bày bằng danh sách đánh số hoặc gạch đầu dòng.
+            - Nếu có nhiều dòng dữ liệu, trình bày bằng danh sách đánh số hoặc gạch đầu dòng ( lưu ý không dùng dấu ' * ').
             - Không nhắc JSON, tool, backend, database hoặc prompt.
             - Nếu không có dữ liệu, nói chưa tìm thấy thông tin phù hợp.
             - Nếu hệ thống báo lỗi, nói hiện chưa tra cứu được và đề nghị thử lại hoặc bổ sung thông tin.
@@ -190,19 +191,55 @@ class PromptBuilder:
         now = datetime.now(ZoneInfo(self.TIMEZONE))
         today = now.date()
 
+        # Tuần này: thứ 2 -> chủ nhật
         week_start = today - timedelta(days=today.weekday())
         week_end = week_start + timedelta(days=6)
 
+        # Tuần trước
+        last_week_start = week_start - timedelta(days=7)
+        last_week_end = week_start - timedelta(days=1)
+
+        # Tuần sau
+        next_week_start = week_start + timedelta(days=7)
+        next_week_end = next_week_start + timedelta(days=6)
+
+        # Tháng này
         month_start = today.replace(day=1)
         month_end = today.replace(day=monthrange(today.year, today.month)[1])
+
+        # Tháng trước
+        last_month_end = month_start - timedelta(days=1)
+        last_month_start = last_month_end.replace(day=1)
+
+        # Tháng sau
+        next_month_start = month_end + timedelta(days=1)
+        next_month_end = next_month_start.replace(
+            day=monthrange(next_month_start.year, next_month_start.month)[1]
+        )
 
         return {
             "current_date": today.isoformat(),
             "weekday": self.WEEKDAYS[today.weekday()],
+
             "week_start": week_start.isoformat(),
             "week_end": week_end.isoformat(),
+            "last_week_start": last_week_start.isoformat(),
+            "last_week_end": last_week_end.isoformat(),
+            "next_week_start": next_week_start.isoformat(),
+            "next_week_end": next_week_end.isoformat(),
+
             "month_start": month_start.isoformat(),
             "month_end": month_end.isoformat(),
+            "last_month_start": last_month_start.isoformat(),
+            "last_month_end": last_month_end.isoformat(),
+            "next_month_start": next_month_start.isoformat(),
+            "next_month_end": next_month_end.isoformat(),
+
+            "next_7_days_start": today.isoformat(),
+            "next_7_days_end": (today + timedelta(days=7)).isoformat(),
+            "last_7_days_start": (today - timedelta(days=7)).isoformat(),
+            "last_7_days_end": today.isoformat(),
+
             "days_until_month_end": (month_end - today).days,
             "year_start": today.replace(month=1, day=1).isoformat(),
             "year_end": today.replace(month=12, day=31).isoformat(),

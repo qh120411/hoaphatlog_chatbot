@@ -71,7 +71,7 @@ class PlanInspecDataService:
                     bks_xe_cu,
                     bks_xe_moi,
                     chung_loai_xe,
-                    han_dang_kiem,
+                    han_dang_kiem_xe,
                     COUNT(*) OVER() AS tong
                 FROM kh_dang_kiem
                 WHERE ngay_thuc_hien IS NULL AND MONTH(han_dang_kiem_xe) = MONTH(CURRENT_DATE())
@@ -92,7 +92,7 @@ class PlanInspecDataService:
             }
         
     @staticmethod
-    #check mooc thực hiện đăng kiểm theo kế hoạch tháng này chưa
+    #check mooc chưa thực hiện đăng kiểm theo kế hoạch tháng này
     def check_trailer_inspection_time():
         try:
             with Database() as db:
@@ -101,6 +101,7 @@ class PlanInspecDataService:
                     bks_ro_mooc,
                     chung_loai_mooc,
                     han_dang_kiem_ro_mooc,
+                    ngay_thuc_hien,
                     COUNT(*) OVER() AS tong
                 FROM kh_dang_kiem
                 WHERE ngay_thuc_hien IS NULL AND MONTH(han_dang_kiem_ro_mooc) = MONTH(CURRENT_DATE())
